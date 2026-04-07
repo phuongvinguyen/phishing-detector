@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from analyzer.url_checks import extract_features
-
+import sys
 
 def predict_url(url, model):
     features = extract_features(url)
@@ -17,6 +17,12 @@ def predict_url(url, model):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Corrected syntax: python main.py <url>")
+        sys.exit(1)
+    
+    input = sys.argv[1]
+
     df = pd.read_csv("phishing_site_urls.csv")
 
     print(df.columns)  # debug check
@@ -37,7 +43,5 @@ if __name__ == "__main__":
     print("Accuracy:", model.score(X_test, y_test))
 
     # test prediction
-    
-    test_url = "http://fake-login.xyz"
-    result, prob = predict_url(test_url, model)
-    print(f"{test_url} → {result} ({prob:.2f})")
+    result, prob = predict_url(input, model)
+    print(f"{input} → {result} ({prob:.2f})")
