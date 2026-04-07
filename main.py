@@ -39,7 +39,5 @@ if __name__ == "__main__":
     # test prediction
     
     test_url = "http://fake-login.xyz"
-    print("Enter urk: ")
-    url = input
-    result, prob = predict_url(url, model)
-    print(f"{url} → {result} ({prob:.2f})")
+    result, prob = predict_url(test_url, model)
+    print(f"{test_url} → {result} ({prob:.2f})")
