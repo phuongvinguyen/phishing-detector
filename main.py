@@ -2,29 +2,44 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from analyzer.url_checks import extract_features
-#load dataset
-df = pd.read_csv("data.csv")
 
-#extract features
-x = df["url"].apply(extract_features).apply(pd.Series)
-y = df["label"]
-
-#split
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
-
-#train
-model = LogisticRegression()
-model.fit(x_train, y_train)
-
-#evaluate
-print("Accuracy: ", model.score(x_test, y_test))
 
 def predict_url(url, model):
     features = extract_features(url)
-    df = pd.DataFrame([features])
-    prob = model.predict_proba(df)[0][1]
+    df = pd.DataFrame([features])[model.feature_names_in_]
+    phishing_index = list(model.classes_).index(1)
+    prob = model.predict_proba(df)[0][phishing_index]
 
     if prob > 0.7:
         return "Phishing", prob
     else:
         return "Safe", prob
+
+
+if __name__ == "__main__":
+    df = pd.read_csv("phishing_site_urls.csv")
+
+    print(df.columns)  # debug check
+
+    X = df["URL"].apply(extract_features).apply(pd.Series)
+    y = df["Label"].map({
+        "good" : 0,
+        "bad" : 1
+    })
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X_train, y_train)
+
+    print("Accuracy:", model.score(X_test, y_test))
+
+    # test prediction
+    
+    test_url = "http://fake-login.xyz"
+    print("Enter urk: ")
+    url = input
+    result, prob = predict_url(url, model)
+    print(f"{url} → {result} ({prob:.2f})")
